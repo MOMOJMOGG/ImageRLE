@@ -44,10 +44,9 @@ typedef struct RLEtb {
 	int Xstart;
 	int Xend;
 	int Ypos;
+	int count;
 	RLEtb *nextnode;
 	RLEtb *beside;
-	RLEtb *parenode;
-	int count;
 }RLEtable;
 
 typedef struct the_p {

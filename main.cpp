@@ -79,9 +79,8 @@ int main()
 	theblob = g_img->BuildRLE(g_img->GetRaw(), g_img->GetImgWidth(), g_img->GetImgHeight(), 128);
 	//g_img->PrintBlob(theblob);
 
-	ItemInfo *theItm = g_img->GetInfoFromBlob(theblob,5);
-	//
-	g_img->PrintITM(theItm);
+	ItemInfo *theItm = g_img->GetInfoFromBlob(theblob,40);
+	//g_img->PrintITM(theItm);
 	g_img->CleanItem(theItm);
 	//
 	end_t = clock();
@@ -90,7 +89,6 @@ int main()
 	system("pause");
 	//g_img->Savefile("sailsaaaa.bmp");
 	system("pause");
-	unsigned char *raw = NULL;
 	
 	return 0;
 }

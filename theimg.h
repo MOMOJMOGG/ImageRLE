@@ -30,7 +30,7 @@ public:
 	void Show();
 	unsigned char *Binary(unsigned char *raw, int wid, int hei, int kbit);
 	RLEtable *BuildRLE(unsigned char *raw, int wid,int hei, int threshold);
-	RLEtable *FindNodeHead(RLEtable *curr, int mode, int pos);
+	RLEtable *FindNodeHead(RLEtable *curr, int mode, int pos, RLEtable *tar);
 	void ChangeNodetar(RLEtable *curr, int item, int val, int val2);
 	void DeleteBlobNode(RLEtable *blobtar,int mode);
 	void PrintBlob(RLEtable *blobhead);
