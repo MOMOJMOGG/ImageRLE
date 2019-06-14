@@ -6,7 +6,7 @@
 int main()
 {
 	theimg *g_img = new theimg();
-	time_t str_t, end_t;
+	double str_t, end_t;
 	g_img->LoadBMPfile("lenaaaa.bmp");
 	//printf("Img width : %d, Img height : %d\n", g_img->GetImgWidth(), g_img->GetImgHeight());
 	//g_img->Show();
@@ -71,21 +71,22 @@ int main()
 	//						  };
 
 	RLEtable *theblob;
-	str_t = time(NULL);
+	str_t = clock();
 	//theblob = g_img->BuildRLE(theraw, 5, 5, 50);
 	//theblob = g_img->BuildRLE(theraw, 10, 10, 50);
 	//theblob = g_img->BuildRLE(theraw, 15, 15, 50);
 	//g_img->GetImgHeight()
-	theblob = g_img->BuildRLE(g_img->GetRaw(), g_img->GetImgWidth(), g_img->GetImgHeight(), 127);
-	
+	theblob = g_img->BuildRLE(g_img->GetRaw(), g_img->GetImgWidth(), g_img->GetImgHeight(), 128);
+	//g_img->PrintBlob(theblob);
 
-	ItemInfo *theItm = g_img->GetInfoFromBlob(theblob, 5, g_img->GetImgWidth(), g_img->GetImgHeight());
+	ItemInfo *theItm = g_img->GetInfoFromBlob(theblob,5);
+	//
 	g_img->PrintITM(theItm);
 	g_img->CleanItem(theItm);
-	//g_img->PrintBlob(theblob);
-	end_t = time(NULL);
+	//
+	end_t = clock();
 	double diff_t = difftime(end_t, str_t);
-	printf("Time = %f\n", diff_t);
+	printf("Time = %f ms\n", diff_t);
 	system("pause");
 	//g_img->Savefile("sailsaaaa.bmp");
 	system("pause");

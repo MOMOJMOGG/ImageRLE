@@ -299,9 +299,9 @@ RLEtable *theimg::BuildRLE(unsigned char *raw, int wid,int hei,int threshold)
 {
 	// 上層col指標, 該層col指標, 暫存指標1, 暫存指標2, 資料集指標, 資料集暫存指標
 	RLEtable *parentcol, *currcol,  *tmpnode1, *tmpnode2, *Blob, *tmpblob;   
-	parentcol = new RLEtable{ 0,0,0,0,NULL,NULL,NULL,NULL,0 };    // 指標建構子
-	currcol = new RLEtable{ 0,0,0,0,NULL,NULL,NULL,NULL,0 };
-	Blob = new RLEtable{ 0,0,0,0,NULL,NULL,NULL,NULL,0 };
+	parentcol = new RLEtable{ 0,0,0,0,NULL,NULL,NULL,0 };    // 指標建構子
+	currcol = new RLEtable{ 0,0,0,0,NULL,NULL,NULL,0 };
+	Blob = new RLEtable{ 0,0,0,0,NULL,NULL,NULL,0 };
 	
 	bool headexitflag = false;    // 起始節點旗標
 	int blobindex = 1;  
@@ -322,7 +322,7 @@ RLEtable *theimg::BuildRLE(unsigned char *raw, int wid,int hei,int threshold)
 				*(raw + i + j * wid) = 0;      // 二值化變黑
 				if (!headexitflag) // 沒有旗標 代表為節點起始處
 				{
-					RLEtable *newnode = new RLEtable{ 0,i,i,j,NULL,NULL,NULL,NULL,0 };    // 新增節點
+					RLEtable *newnode = new RLEtable{ 0,i,i,j,NULL,NULL,NULL,0 };    // 新增節點
 					tmpnode2->beside = newnode;
 					tmpnode2 = tmpnode2->beside;
 					headexitflag = true;    // 立起節點起點旗標
@@ -394,14 +394,14 @@ RLEtable *theimg::BuildRLE(unsigned char *raw, int wid,int hei,int threshold)
 						if (tmpnode1->nextnode == NULL) // U字形
 						{
 							// 模式 1 : 節點, 模式(parent), 位移量
-							tmpblob = FindNodeHead(tmpnode1, 1, NULL);         // 找到Blob串首點
-							tmpnode2->parenode->nextnode = tmpblob->nextnode;  // 應當是Blob串下一點
-							tmpblob->nextnode->parenode = tmpnode2->parenode;
+							tmpblob = FindNodeHead(Blob, 1, tmpnode1->Index);         // 找到Blob串首點 之 前一點
+							tmpnode2->parenode->nextnode = tmpblob->beside->nextnode;  // 應當是Blob串下一點
+							tmpblob->beside->nextnode->parenode = tmpnode2->parenode;
 							// 模式 2 : 節點, 模式, 更新量(對Index)
-							ChangeNodetar(tmpblob->nextnode, 2, tmpnode2->parenode->Index, NULL);  // 更新原本Blob串編號(一坨) 
-							ChangeNodetar(Blob, 3, tmpnode2->Index, tmpblob->Ypos);    // 更新Blob 之 size 大小
-							tmpblob->nextnode = NULL;      // 將 原本Blob 鏈結斷開
-							DeleteBlobNode(tmpblob, 0);       // 刪除blob無用節點
+							ChangeNodetar(tmpblob->beside->nextnode, 2, tmpnode2->parenode->Index, NULL);  // 更新原本Blob串編號(一坨) 
+							ChangeNodetar(Blob, 3, tmpnode2->Index, tmpblob->beside->Ypos);    // 更新Blob 之 size 大小
+							tmpblob->beside->nextnode = NULL;      // 將 原本Blob 鏈結斷開
+							DeleteBlobNode(tmpblob, 0);       // 刪除blob無用節點(放前一點)
 							tmpnode1->nextnode = tmpnode2;
 							tmpnode2->parenode = tmpnode1;
 						}
@@ -421,11 +421,10 @@ RLEtable *theimg::BuildRLE(unsigned char *raw, int wid,int hei,int threshold)
 		{
 			if (tmpnode2->count == 0)
 			{   // Blob format : Blob編號, 無, 無, 總共幾筆區塊(size), 下, 右, 左, 上, 無
-				RLEtable *newnode = new RLEtable{ blobindex,0,0,1,NULL,NULL,NULL,NULL,0 };
+				RLEtable *newnode = new RLEtable{ blobindex,0,0,1,NULL,NULL,NULL,0 };
 				// 模式 2 : 節點, 模式(beside), 位移量
 				tmpblob = FindNodeHead(Blob, 2, NULL);    // 找到Blob最右處進行插入
 				tmpblob->beside = newnode;                // Blob鏈結(右左)
-				newnode->preside = tmpblob;
 				newnode->nextnode = tmpnode2;             // 與起始節點鏈結(下上)
 				tmpnode2->parenode = newnode;
 				tmpnode2->Index = newnode->Index;         // 設定Blob編號
@@ -453,7 +452,6 @@ RLEtable *theimg::BuildRLE(unsigned char *raw, int wid,int hei,int threshold)
 void theimg::CleanNode(RLEtable *tar)
 {
 	tar->beside = NULL;
-	tar->preside = NULL;
 	tar->nextnode = NULL;
 	tar->parenode = NULL;
 	delete tar;
@@ -464,10 +462,9 @@ RLEtable *theimg::FindNodeHead(RLEtable *curr, int mode, int pos)// mode 1 : par
 	switch (mode)
 	{
 	case 1:
-		curr = curr->parenode;
-		while (curr->parenode != NULL)
+		while (curr->beside->Index != pos)
 		{
-			curr = curr->parenode;
+			curr = curr->beside;
 		}
 		break;
 	case 2:
@@ -535,13 +532,11 @@ void theimg::ChangeNodetar(RLEtable *curr, int item, int val, int val2)
 
 void theimg::DeleteBlobNode(RLEtable *blobtar, int mode)
 {
-	if (mode == 0)
+	if (mode == 0) // 餵入前一點
 	{
-		RLEtable *prenode = blobtar->preside;
-		prenode->beside = blobtar->beside;
-		if (blobtar->beside != NULL)
-			blobtar->beside->preside = prenode;
-		CleanNode(blobtar);
+		RLEtable *besidenode = blobtar->beside;
+		blobtar->beside = besidenode->beside;
+		CleanNode(besidenode);
 	}
 	else
 	{
@@ -618,7 +613,7 @@ ItemInfo *theimg::GetInfoFromBlob(RLEtable *blob, int filtersize)
 				tmp2 = tmp1->nextnode;
 				DeleteBlobNode(tmp2, 1);
 			}
-			DeleteBlobNode(tmp1, 0); // 清空blob節點
+			DeleteBlobNode(blob, 0); // 清空blob beside節點 餵入前一點(為Blob)
 			tmp1 = blob->beside;
 		}
 		else
@@ -676,7 +671,7 @@ ItemInfo *theimg::GetInfoFromBlob(RLEtable *blob, int filtersize)
 			// xsum 處理
 			// ysum 處理
 			// tmpitmnode->theta == ?
-			DeleteBlobNode(tmp1, 0);
+			DeleteBlobNode(blob, 0);
 			tmp1 = blob->beside;
 		}
 		// 初始化
@@ -743,7 +738,7 @@ void theimg::ClearBlob(RLEtable *blobhead)
 			tmpnode = tmpblob->nextnode;
 			DeleteBlobNode(tmpnode, 1);
 		}
-		DeleteBlobNode(tmpblob, 0);
+		DeleteBlobNode(blobhead, 0);
 		tmpblob = blobhead->beside;
 	}
 	if (blobhead != NULL)

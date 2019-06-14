@@ -46,7 +46,6 @@ typedef struct RLEtb {
 	int Ypos;
 	RLEtb *nextnode;
 	RLEtb *beside;
-	RLEtb *preside;
 	RLEtb *parenode;
 	int count;
 }RLEtable;
