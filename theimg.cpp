@@ -596,7 +596,7 @@ void theimg::PrintDebug(RLEtable *nodehead, int mode)
 	
 }
 
-ItemInfo *theimg::GetInfoFromBlob(RLEtable *blob, int filtersize, int wid, int hei)
+ItemInfo *theimg::GetInfoFromBlob(RLEtable *blob, int filtersize)
 {
 	RLEtable *tmp1, *tmp2;
 	int xmin = 0, xmax = 0,ymin = 0, ymax = 0;
@@ -628,7 +628,7 @@ ItemInfo *theimg::GetInfoFromBlob(RLEtable *blob, int filtersize, int wid, int h
 			{
 				if (initflag) // 第一次要創節點
 				{
-					ItemInfo *newitm = new ItemInfo{ {{0,0},{0,0},{0,0},{0,0}},0,0.0,NULL }; ;
+					ItemInfo *newitm = new ItemInfo{ {{tmp2->Xstart,tmp2->Ypos},{tmp2->Xend,tmp2->Ypos},{(tmp2->Xstart+ tmp2->Xend)/2,tmp2->Ypos},{(tmp2->Xstart + tmp2->Xend) / 2,tmp2->Ypos}},0,0.0,NULL };
 					//InitItm(newitm);
 					tmpitmnode->next = newitm;
 					itmnode->targetNum += 1;
@@ -730,4 +730,22 @@ void theimg::PrintITM(ItemInfo *ITM)
 			ITM->points[3].x, ITM->points[3].y);
 		ITM = ITM->next;
 	}
+}
+
+void theimg::ClearBlob(RLEtable *blobhead)
+{
+	RLEtable *tmpblob, *tmpnode;
+	tmpblob = blobhead->beside;
+	while (tmpblob != NULL)
+	{
+		while (tmpblob->nextnode != NULL)
+		{
+			tmpnode = tmpblob->nextnode;
+			DeleteBlobNode(tmpnode, 1);
+		}
+		DeleteBlobNode(tmpblob, 0);
+		tmpblob = blobhead->beside;
+	}
+	if (blobhead != NULL)
+		CleanNode(blobhead);
 }

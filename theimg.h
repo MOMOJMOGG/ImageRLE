@@ -35,10 +35,11 @@ public:
 	void DeleteBlobNode(RLEtable *blobtar,int mode);
 	void PrintBlob(RLEtable *blobhead);
 	void PrintDebug(RLEtable *nodehead,int mode);
-	ItemInfo *GetInfoFromBlob(RLEtable *blob, int filtersize, int wid, int hei);
+	ItemInfo *GetInfoFromBlob(RLEtable *blob, int filtersize);
 	void InitItm(ItemInfo *ITM);
 	void PrintITM(ItemInfo *ITM);
 	void CleanNode(RLEtable *tar);
 	void CleanItem(ItemInfo *theITM);
+	void ClearBlob(RLEtable *blobhead);
 };
 #endif // !THEIMG_H
