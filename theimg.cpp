@@ -608,7 +608,7 @@ ItemInfo *theimg::GetInfoFromBlob(RLEtable *blob, int filtersize)
 	RLEtable *tmp1, *tmp2;
 	int xmin = 0, xmax = 0,ymin = 0, ymax = 0;
 	ItemInfo *itmnode, *tmpitmnode;
-	itmnode = new ItemInfo{ {{0,0},{0,0},{0,0},{0,0}},0,0.0,NULL };   // 指標建構子
+	itmnode = new ItemInfo{ {{0,0},{0,0},{0,0},{0,0}},NULL };   // 指標建構子
 	tmpitmnode = itmnode;
 
 	bool initflag = true;
@@ -630,9 +630,9 @@ ItemInfo *theimg::GetInfoFromBlob(RLEtable *blob, int filtersize)
 			{
 				if (initflag) // 第一次要創節點
 				{
-					ItemInfo *newitm = new ItemInfo{ {{tmp2->Xstart,tmp2->Ypos},{tmp2->Xend,tmp2->Ypos},{(tmp2->Xstart+ tmp2->Xend)/2,tmp2->Ypos},{(tmp2->Xstart + tmp2->Xend) / 2,tmp2->Ypos}},0,0.0,NULL };
+					ItemInfo *newitm = new ItemInfo{ {{tmp2->Xstart,tmp2->Ypos},{tmp2->Xend,tmp2->Ypos},{(tmp2->Xstart+ tmp2->Xend)/2,tmp2->Ypos},{(tmp2->Xstart + tmp2->Xend) / 2,tmp2->Ypos}},NULL };
 					tmpitmnode->next = newitm;
-					itmnode->targetNum += 1;
+					itmnode->points[0].x += 1;
 					tmpitmnode = tmpitmnode->next;
 					initflag = false;
 
@@ -691,8 +691,6 @@ void theimg::InitItm(ItemInfo *ITM)
 		ITM->points[pp].y = 0;
 	}
 	ITM->next = NULL;
-	ITM->targetNum = 0;
-	ITM->theta = 0.0;
 }
 
 void theimg::CleanItem(ItemInfo *theITM)
@@ -711,7 +709,7 @@ void theimg::CleanItem(ItemInfo *theITM)
 
 void theimg::PrintITM(ItemInfo *ITM)
 {
-	printf("<<ITM Head Size : %d >>\n", ITM->targetNum);
+	printf("<<ITM Head Size : %d >>\n", ITM->points[0].x);
 	ITM = ITM->next;
 	while (ITM != NULL)
 	{

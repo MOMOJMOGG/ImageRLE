@@ -56,8 +56,6 @@ typedef struct the_p {
 
 typedef struct iteminfo {
 	the_p points[4];  // 0:xmin,1:xmax,2:ymin,3:ymax
-	int targetNum;
-	double theta;
 	iteminfo *next;
 }ItemInfo;
 
