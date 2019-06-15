@@ -362,31 +362,39 @@ RLEtable *theimg::BuildRLE(unsigned char *raw, int wid,int hei,int threshold)
 						}
 						else
 						{
-							if (tmpnode1->count == 1) // 倒日型左下
-							{
-								// 模式 3 : 節點, 模式(next), 位移量
+							
 								tmpblob = FindNodeHead(tmpnode1, 3, NULL, NULL); // 找最後一點
 								tmpblob->nextnode = tmpnode2;
 								tmpnode2->Index = tmpnode1->Index;             // 更新Blob編號
 								// 模式 3 : 節點, 模式, 位移量, 增加量
 								ChangeNodetar(Blob, 3, tmpnode2->Index, 1);    // 更新Blob 之 size 大小
-							}
-							else // m字形
-							{
-								// 模式 3 : 節點, 模式(next), 位移量
-								tmpblob = FindNodeHead(tmpnode1, 3, tmpnode1->count-1, NULL);
-								tmpnode2->nextnode = tmpblob->nextnode; 
-								tmpblob->nextnode = tmpnode2;
-								tmpnode2->Index = tmpnode1->Index;              // 更新Blob編號
-								ChangeNodetar(Blob, 3, tmpnode2->Index, 1);    // 更新Blob 之 size 大小
-							}
+								
+
+							//if (tmpnode1->count == 1) // 倒日型左下
+							//{
+							//	// 模式 3 : 節點, 模式(next), 位移量
+							//	tmpblob = FindNodeHead(tmpnode1, 3, NULL, NULL); // 找最後一點
+							//	tmpblob->nextnode = tmpnode2;
+							//	tmpnode2->Index = tmpnode1->Index;             // 更新Blob編號
+							//	// 模式 3 : 節點, 模式, 位移量, 增加量
+							//	ChangeNodetar(Blob, 3, tmpnode2->Index, 1);    // 更新Blob 之 size 大小
+							//}
+							//else // m字形
+							//{
+							//	// 模式 3 : 節點, 模式(next), 位移量
+							//	tmpblob = FindNodeHead(tmpnode1, 3, tmpnode1->count-1, NULL);
+							//	tmpnode2->nextnode = tmpblob->nextnode; 
+							//	tmpblob->nextnode = tmpnode2;
+							//	tmpnode2->Index = tmpnode1->Index;              // 更新Blob編號
+							//	ChangeNodetar(Blob, 3, tmpnode2->Index, 1);    // 更新Blob 之 size 大小
+							//}
 						}
 					}
 					else // U字形, 無型										///////倒日型中間, 倒日型右下
 					{
-						if (tmpnode1->nextnode == NULL) // U字形
+						
+						if (tmpnode1->Index != tmpnode2->Index) // U字形
 						{
-							// 模式 1 : 節點, 模式(parent), 位移量
 							tmpblob = FindNodeHead(Blob, 1, tmpnode1->Index, NULL);         // 找到Blob串首點之左一點(preside)
 							RLEtable *tmppare = FindNodeHead(Blob, 4, tmpnode2->Index, tmpnode2); // 找此節點之上一點(parenode)
 							tmppare->nextnode = tmpblob->beside->nextnode; // 應當是Blob串下一點
@@ -395,8 +403,33 @@ RLEtable *theimg::BuildRLE(unsigned char *raw, int wid,int hei,int threshold)
 							ChangeNodetar(Blob, 3, tmpnode2->Index, tmpblob->beside->Ypos);    // 更新Blob 之 size 大小
 							tmpblob->beside->nextnode = NULL;      // 將 原本Blob 鏈結斷開
 							DeleteBlobNode(tmpblob, 0);       // 刪除blob無用節點(放前一點preside)
-							tmpnode1->nextnode = tmpnode2;
+							if (tmpnode1->nextnode != NULL)
+							{
+								tmpblob = FindNodeHead(tmpnode1, 3, NULL, NULL);
+								tmpblob->nextnode = tmpnode2;
+							}
+							else
+								tmpnode1->nextnode = tmpnode2;
 						}
+						else
+						{
+							//do nothing 
+						}
+						
+
+						//if (tmpnode1->nextnode == NULL) // U字形
+						//{
+						//	// 模式 1 : 節點, 模式(parent), 位移量
+						//	tmpblob = FindNodeHead(Blob, 1, tmpnode1->Index, NULL);         // 找到Blob串首點之左一點(preside)
+						//	RLEtable *tmppare = FindNodeHead(Blob, 4, tmpnode2->Index, tmpnode2); // 找此節點之上一點(parenode)
+						//	tmppare->nextnode = tmpblob->beside->nextnode; // 應當是Blob串下一點
+						//	// 模式 2 : 節點, 模式, 更新量(對Index)
+						//	ChangeNodetar(tmpblob->beside->nextnode, 2, tmpnode2->Index, NULL);  // 更新原本Blob串編號(一坨) 
+						//	ChangeNodetar(Blob, 3, tmpnode2->Index, tmpblob->beside->Ypos);    // 更新Blob 之 size 大小
+						//	tmpblob->beside->nextnode = NULL;      // 將 原本Blob 鏈結斷開
+						//	DeleteBlobNode(tmpblob, 0);       // 刪除blob無用節點(放前一點preside)
+						//	tmpnode1->nextnode = tmpnode2;
+						//}
 					}
 				}
 				tmpnode1 = tmpnode1->beside;    // parecol 右位移
